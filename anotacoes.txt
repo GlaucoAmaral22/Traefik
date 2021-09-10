@@ -1,0 +1,38 @@
+docker run --rm -it -d --name meu-c1 -p 8080:8080 -e MY_NODE_ID=1 secondimage
+docker run --rm -it -d --name meu-c2 -p 8081:8080 -e MY_NODE_ID=2 secondimage
+
+
+----NGINX----
+1. no nginx, pelo que entendi, o arquivo 'nginx.tmpl' gera o '/etc/nginx/confi.d/default.conf'
+2. o arquivo /etc/nginx/nginx.conf puxa todos os arquivos que estao em '/etc/nginx/confi.d/*.conf'
+
+proxy_pass eh um redirecionamento
+upstream -> conjunto de maquinas 
+
+ex:
+
+upstream nodes {
+	server node1
+	server node2
+}
+
+server {
+	listen 80;
+	server_name localhost;
+
+	location / {
+		proxy_pass http://nodes;
+	}
+}
+
+----NGINX----
+ 
+ 
+ sexta(03):
+ Após ter configurado o traefik no bco e colocado labels somente no vegas-admin e store, houve problema no vegas-admin pq ele solicita certificado.
+ solucação: gerenciar certificador confiaveis pelo navegador!!!
+
+
+https://traefik.io/blog/traefik-2-tls-101-23b4fbee81f1/
+
+Criação de um certificado valido: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout cert.key -out cert.crt   ...  lembrar que no step 'Common Name (e.g. server FQDN or YOUR name):' é o domain que o cert será usado.

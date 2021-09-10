@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    #Imagem oficial do traefik
+    image: traefik:v2.5
+    #Habilia a interface web e informa ao traefik que o provider é o docker
+    command: 
+      - --api.insecure=true
+      - --providers.docker=true
+      #declaracao de dois entrypoints do container do traefik, port 80 para http e 443 para https.
+      - --entrypoints.web.address=:80
+      - --entrypoints.web-secure.address=:443
+      #o file provider permite definir a configuração dinamica com arquivos yaml ou toml. Ele especifica o caminho onde estao os arquivos de config.
+      - --providers.file.directory=/configuration/
+      #permite o traefik observar esse arquivo e caso haja alteração, ele irá carregas-las.
+      - --providers.file.watch=true
+    ports:
+        # Porta HTTP
+        - "80:80" 
+        # Porta HTTPS
+        - "443:443"
+        # A Web UI (habilitada pelo --api.insecure=true)
+        - "8080:8080"
+    volumes:
+        #Para que o Traefik possa ouvir os eventos do Docker
+        - /var/run/docker.sock:/var/run/docker.sock
+        #Aqui estou compartilhando meu diretorio atual para dentro do "/configuration" do container
+        - ./:/configuration/
+        #Aqui estou compartilhando meu diretorio atual para dentro do "/certs" do container
+        - ./certs/:/certs/
+  whoami:
+    # Um container que expoe uma api que mostra o ip
+    image: traefik/whoami
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+      - "traefik.http.routers.whoami.tls=true"
+
+  php-teste:
+    image: secondimage
+    labels:
+      - "traefik.http.routers.php.rule=Host(`phpteste.docker.localhost`)"
+      - "traefik.http.routers.php.tls=true"
+    expose:
+      - 80
