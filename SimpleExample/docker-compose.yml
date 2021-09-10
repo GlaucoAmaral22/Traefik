@@ -9,6 +9,7 @@ services:
       - --api.insecure=true
       - --providers.docker=true
       #declaracao de dois entrypoints do container do traefik, port 80 para http e 443 para https.
+      # EntryPoints são os pontos de entrada da rede NO TRAEFIK
       - --entrypoints.web.address=:80
       - --entrypoints.web-secure.address=:443
       #o file provider permite definir a configuração dinamica com arquivos yaml ou toml. Ele especifica o caminho onde estao os arquivos de config.
